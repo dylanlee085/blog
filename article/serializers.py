@@ -22,9 +22,10 @@ class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = [
-            'created',
             'id',
             'title',
+            'author',
+            'created',
 
         ]
 

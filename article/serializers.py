@@ -12,6 +12,7 @@ from article.models import Article
 #     updated = serializers.DateTimeField()
 
 # 序列化, 优化后, 父类变成ModelSerializer
+# 获取文章列表
 class ArticleListSerializer(serializers.ModelSerializer):
     """
     自动推断需要序列化的字段及类型
@@ -26,3 +27,9 @@ class ArticleListSerializer(serializers.ModelSerializer):
             'title',
 
         ]
+
+# 获取文章详情
+class ArticleDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        fields = '__all__'

@@ -1,3 +1,4 @@
+from re import A
 from django.http import JsonResponse
 from article.models import Article
 from article.serializers import ArticleListSerializer
@@ -5,6 +6,15 @@ from article.serializers import ArticleListSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
+
+from django.http import Http404
+from article.models import Article
+
+from article.serializers import ArticleDetailSerializer
+
+
+
 
 # Create your views here.
 
@@ -33,3 +43,37 @@ def article_list(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+序列化器 serializer 不仅可以将数据进行序列化、反序列化，还包含数据验证、错误处理、数据库操作等能力。
+"""
+class ArticleDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Article.objects.get(pk=pk)
+        except:
+            raise Http404
+
+    def get(self, request, pk):
+        article = self.get_object(pk)
+        serializer = ArticleDetailSerializer(article)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        article = self.get_object(pk)
+        serializer = ArticleDetailSerializer(article, data=request.data)
+        # 验证提交的数据是否合法
+        # 不合法则返回400
+        if serializer.is_valid():
+            # 序列化器将持有的数据反序列化后，
+            # 保存到数据库中
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        article = self.get_object(pk)
+        article.delete()
+        # 删除成功后返回204
+        return Response(status=status.HTTP_204_NO_CONTENT)
